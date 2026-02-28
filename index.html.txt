@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniWar — The World's Universities, Ranked By You</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --accent: #ff3c00;
+    --accent2: #ffcc00;
+    --text: #f0f0f0;
+    --muted: #555;
+    --win: #00ff87;
+    --lose: #ff3c00;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Space Mono’, monospace;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 0;
+}
+
+header {
+border-bottom: 1px solid var(–border);
+padding: 16px 40px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+position: relative;
+z-index: 10;
+}
+
+.logo { font-family: ‘Bebas Neue’, sans-serif; font-size: 28px; letter-spacing: 3px; }
+.logo span { color: var(–accent); }
+
+.vote-counter { font-size: 11px; color: var(–muted); text-align: right; line-height: 1.6; }
+.vote-counter strong { color: var(–accent2); font-size: 18px; display: block; }
+
+nav {
+display: flex;
+border-bottom: 1px solid var(–border);
+position: relative;
+z-index: 10;
+}
+
+nav button {
+background: none;
+border: none;
+padding: 14px 28px;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+letter-spacing: 2px;
+text-transform: uppercase;
+cursor: pointer;
+border-bottom: 2px solid transparent;
+transition: all 0.2s;
+}
+
+nav button.active { color: var(–text); border-bottom-color: var(–accent); }
+nav button:hover { color: var(–text); }
+
+main {
+position: relative;
+z-index: 10;
+max-width: 1100px;
+margin: 0 auto;
+padding: 40px 20px;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.battle-headline {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: clamp(32px, 5vw, 56px);
+letter-spacing: 4px;
+text-align: center;
+margin-bottom: 8px;
+line-height: 1;
+}
+
+.battle-subline {
+text-align: center;
+font-size: 11px;
+color: var(–muted);
+letter-spacing: 2px;
+margin-bottom: 48px;
+}
+
+.battle-arena {
+display: grid;
+grid-template-columns: 1fr auto 1fr;
+gap: 20px;
+align-items: center;
+margin-bottom: 32px;
+}
+
+.university-card {
+background: var(–surface);
+border: 1px solid var(–border);
+padding: 32px 28px;
+cursor: pointer;
+transition: all 0.15s ease;
+position: relative;
+overflow: hidden;
+min-height: 200px;
+}
+
+.university-card::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: var(–accent);
+opacity: 0;
+transition: opacity 0.15s;
+}
+
+.university-card:hover::before { opacity: 0.05; }
+.university-card:hover { border-color: var(–accent); transform: translateY(-2px); }
+.university-card:active { transform: scale(0.98); }
+
+.card-rank { font-size: 11px; color: var(–muted); letter-spacing: 2px; margin-bottom: 16px; }
+.card-flag { font-size: 36px; margin-bottom: 12px; display: block; }
+.card-name {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: clamp(18px, 2.5vw, 30px);
+letter-spacing: 2px;
+line-height: 1.1;
+margin-bottom: 8px;
+}
+.card-country { font-size: 11px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; }
+.card-elo { position: absolute; top: 16px; right: 16px; font-size: 11px; color: var(–accent2); letter-spacing: 1px; }
+.card-elo span { font-size: 18px; font-weight: 700; display: block; text-align: right; }
+
+.vs-divider {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 48px;
+color: var(–accent);
+text-align: center;
+line-height: 1;
+text-shadow: 0 0 30px rgba(255,60,0,0.5);
+}
+
+.battle-actions { text-align: center; margin-top: 16px; }
+
+.skip-btn {
+background: none;
+border: 1px solid var(–border);
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 11px;
+letter-spacing: 2px;
+padding: 10px 24px;
+cursor: pointer;
+text-transform: uppercase;
+transition: all 0.2s;
+}
+.skip-btn:hover { border-color: var(–muted); color: var(–text); }
+
+.result-flash {
+position: fixed;
+inset: 0;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(0,0,0,0.85);
+z-index: 100;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.15s;
+}
+.result-flash.show { opacity: 1; pointer-events: all; }
+
+.result-content { text-align: center; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+@keyframes pop {
+from { transform: scale(0.7); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+
+.result-winner { font-family: ‘Bebas Neue’, sans-serif; font-size: 72px; color: var(–win); letter-spacing: 4px; line-height: 1; }
+.result-name { font-size: 18px; color: var(–text); margin-top: 8px; letter-spacing: 2px; }
+.result-elo-change { margin-top: 16px; font-size: 13px; color: var(–muted); }
+.result-elo-change .up { color: var(–win); }
+.result-elo-change .down { color: var(–lose); }
+
+.rankings-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+.rankings-title { font-family: ‘Bebas Neue’, sans-serif; font-size: 42px; letter-spacing: 3px; }
+.rankings-subtitle { font-size: 11px; color: var(–muted); letter-spacing: 1px; }
+
+.search-box {
+background: var(–surface);
+border: 1px solid var(–border);
+color: var(–text);
+font-family: ‘Space Mono’, monospace;
+font-size: 12px;
+padding: 10px 16px;
+width: 220px;
+outline: none;
+letter-spacing: 1px;
+}
+.search-box:focus { border-color: var(–accent); }
+.search-box::placeholder { color: var(–muted); }
+
+.rankings-table { width: 100%; border-collapse: collapse; }
+.rankings-table thead tr { border-bottom: 1px solid var(–border); }
+.rankings-table th { font-size: 10px; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; text-align: left; }
+.rankings-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
+.rankings-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.rankings-table td { padding: 14px 16px; font-size: 13px; }
+
+.rank-num { font-family: ‘Bebas Neue’, sans-serif; font-size: 20px; color: var(–muted); width: 50px; }
+.rank-num.top3 { color: var(–accent2); }
+
+.uni-info { display: flex; align-items: center; gap: 12px; }
+.uni-flag-small { font-size: 20px; }
+.uni-name-cell { font-weight: 700; letter-spacing: 0.5px; }
+.uni-country-cell { font-size: 11px; color: var(–muted); margin-top: 2px; }
+
+.elo-cell { text-align: right; font-family: ‘Bebas Neue’, sans-serif; font-size: 22px; color: var(–accent2); letter-spacing: 1px; }
+.wins-cell { text-align: right; font-size: 12px; color: var(–muted); }
+
+.winrate-bar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.bar-bg { width: 60px; height: 4px; background: var(–border); border-radius: 2px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(–accent); border-radius: 2px; }
+
+footer {
+border-top: 1px solid var(–border);
+padding: 20px 40px;
+text-align: center;
+font-size: 10px;
+color: var(–muted);
+letter-spacing: 1px;
+position: relative;
+z-index: 10;
+margin-top: 60px;
+}
+
+@media (max-width: 700px) {
+.battle-arena { grid-template-columns: 1fr; gap: 12px; }
+.vs-divider { font-size: 32px; }
+header { padding: 16px 20px; }
+nav button { padding: 12px 14px; font-size: 10px; }
+.rankings-header { flex-direction: column; gap: 12px; }
+.search-box { width: 100%; }
+}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">UNI<span>WAR</span></div>
+  <div class="vote-counter">
+    <strong id="totalVotes">0</strong>
+    VOTES CAST
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('battle')">⚔ BATTLE</button>
+  <button onclick="showTab('rankings')">🏆 RANKINGS</button>
+</nav>
+
+<main>
+  <div class="tab-content active" id="tab-battle">
+    <div class="battle-headline">WHICH UNIVERSITY WINS?</div>
+    <div class="battle-subline">VOTE · RANK · REPEAT — REAL-TIME ELO RANKINGS BY THE PEOPLE</div>
+
+```
+<div class="battle-arena">
+  <div class="university-card" id="cardA" onclick="vote('A')">
+    <div class="card-elo">ELO <span id="eloA">1500</span></div>
+    <div class="card-rank" id="rankA"></div>
+    <span class="card-flag" id="flagA"></span>
+    <div class="card-name" id="nameA"></div>
+    <div class="card-country" id="countryA"></div>
+  </div>
+
+  <div class="vs-divider">VS</div>
+
+  <div class="university-card" id="cardB" onclick="vote('B')">
+    <div class="card-elo">ELO <span id="eloB">1500</span></div>
+    <div class="card-rank" id="rankB"></div>
+    <span class="card-flag" id="flagB"></span>
+    <div class="card-name" id="nameB"></div>
+    <div class="card-country" id="countryB"></div>
+  </div>
+</div>
+
+<div class="battle-actions">
+  <button class="skip-btn" onclick="nextBattle()">SKIP THIS MATCHUP →</button>
+</div>
+```
+
+  </div>
+
+  <div class="tab-content" id="tab-rankings">
+    <div class="rankings-header">
+      <div>
+        <div class="rankings-title">GLOBAL RANKINGS</div>
+        <div class="rankings-subtitle">RANKED BY ELO — UPDATED IN REAL TIME</div>
+      </div>
+      <input class="search-box" type="text" placeholder="SEARCH UNIVERSITY..." oninput="filterRankings(this.value)" />
+    </div>
+    <table class="rankings-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>University</th>
+          <th style="text-align:right">QS</th>
+          <th style="text-align:right">ELO</th>
+          <th style="text-align:right">W / L</th>
+          <th style="text-align:right">WIN RATE</th>
+        </tr>
+      </thead>
+      <tbody id="rankingsBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<div class="result-flash" id="resultFlash">
+  <div class="result-content">
+    <div class="result-winner">WINNER!</div>
+    <div class="result-name" id="resultName"></div>
+    <div class="result-elo-change" id="resultElo"></div>
+  </div>
+</div>
+
+<footer>
+  ALL RANKINGS BASED ON PUBLIC VOTES · NOT AFFILIATED WITH ANY UNIVERSITY · FOR ENTERTAINMENT PURPOSES ONLY
+</footer>
+
+<script>
+// ============================================================
+// FULL QS TOP 250 DATASET (2024)
+// ============================================================
+const universities = [
+  {id:1,   name:"Massachusetts Institute of Technology",        short:"MIT",          country:"United States",  flag:"🇺🇸", qs:1},
+  {id:2,   name:"Imperial College London",                      short:"Imperial",     country:"United Kingdom", flag:"🇬🇧", qs:2},
+  {id:3,   name:"University of Oxford",                         short:"Oxford",       country:"United Kingdom", flag:"🇬🇧", qs:3},
+  {id:4,   name:"Harvard University",                           short:"Harvard",      country:"United States",  flag:"🇺🇸", qs:4},
+  {id:5,   name:"University of Cambridge",                      short:"Cambridge",    country:"United Kingdom", flag:"🇬🇧", qs:5},
+  {id:6,   name:"Stanford University",                          short:"Stanford",     country:"United States",  flag:"🇺🇸", qs:6},
+  {id:7,   name:"ETH Zurich",                                   short:"ETH Zurich",   country:"Switzerland",    flag:"🇨🇭", qs:7},
+  {id:8,   name:"National University of Singapore",             short:"NUS",          country:"Singapore",      flag:"🇸🇬", qs:8},
+  {id:9,   name:"UCL",                                          short:"UCL",          country:"United Kingdom", flag:"🇬🇧", qs:9},
+  {id:10,  name:"California Institute of Technology",           short:"Caltech",      country:"United States",  flag:"🇺🇸", qs:10},
+  {id:11,  name:"University of Pennsylvania",                   short:"Penn",         country:"United States",  flag:"🇺🇸", qs:11},
+  {id:12,  name:"University of Chicago",                        short:"UChicago",     country:"United States",  flag:"🇺🇸", qs:11},
+  {id:13,  name:"Cornell University",                           short:"Cornell",      country:"United States",  flag:"🇺🇸", qs:13},
+  {id:14,  name:"University of Melbourne",                      short:"UniMelb",      country:"Australia",      flag:"🇦🇺", qs:14},
+  {id:15,  name:"University of Edinburgh",                      short:"Edinburgh",    country:"United Kingdom", flag:"🇬🇧", qs:15},
+  {id:16,  name:"Yale University",                              short:"Yale",         country:"United States",  flag:"🇺🇸", qs:16},
+  {id:17,  name:"Peking University",                            short:"PKU",          country:"China",          flag:"🇨🇳", qs:17},
+  {id:18,  name:"University of Sydney",                         short:"USYD",         country:"Australia",      flag:"🇦🇺", qs:18},
+  {id:19,  name:"Johns Hopkins University",                     short:"JHU",          country:"United States",  flag:"🇺🇸", qs:19},
+  {id:20,  name:"Tsinghua University",                          short:"Tsinghua",     country:"China",          flag:"🇨🇳", qs:20},
+  {id:21,  name:"Princeton University",                         short:"Princeton",    country:"United States",  flag:"🇺🇸", qs:21},
+  {id:22,  name:"Columbia University",                          short:"Columbia",     country:"United States",  flag:"🇺🇸", qs:22},
+  {id:23,  name:"EPFL",                                         short:"EPFL",         country:"Switzerland",    flag:"🇨🇭", qs:23},
+  {id:24,  name:"University of New South Wales",                short:"UNSW",         country:"Australia",      flag:"🇦🇺", qs:24},
+  {id:25,  name:"University of Toronto",                        short:"UofT",         country:"Canada",         flag:"🇨🇦", qs:25},
+  {id:26,  name:"Nanyang Technological University",             short:"NTU",          country:"Singapore",      flag:"🇸🇬", qs:26},
+  {id:27,  name:"Duke University",                              short:"Duke",         country:"United States",  flag:"🇺🇸", qs:27},
+  {id:28,  name:"University of Tokyo",                          short:"UTokyo",       country:"Japan",          flag:"🇯🇵", qs:28},
+  {id:29,  name:"University of Michigan",                       short:"UMich",        country:"United States",  flag:"🇺🇸", qs:29},
+  {id:30,  name:"McGill University",                            short:"McGill",       country:"Canada",         flag:"🇨🇦", qs:30},
+  {id:31,  name:"King's College London",                        short:"KCL",          country:"United Kingdom", flag:"🇬🇧", qs:31},
+  {id:32,  name:"University of Queensland",                     short:"UQ",           country:"Australia",      flag:"🇦🇺", qs:33},
+  {id:33,  name:"Fudan University",                             short:"Fudan",        country:"China",          flag:"🇨🇳", qs:34},
+  {id:34,  name:"Chinese University of Hong Kong",              short:"CUHK",         country:"Hong Kong",      flag:"🇭🇰", qs:36},
+  {id:35,  name:"Technical University of Munich",               short:"TUM",          country:"Germany",        flag:"🇩🇪", qs:37},
+  {id:36,  name:"University of Amsterdam",                      short:"UvA",          country:"Netherlands",    flag:"🇳🇱", qs:53},
+  {id:37,  name:"University of Hong Kong",                      short:"HKU",          country:"Hong Kong",      flag:"🇭🇰", qs:35},
+  {id:38,  name:"Kyoto University",                             short:"Kyoto",        country:"Japan",          flag:"🇯🇵", qs:46},
+  {id:39,  name:"University of British Columbia",               short:"UBC",          country:"Canada",         flag:"🇨🇦", qs:38},
+  {id:40,  name:"New York University",                          short:"NYU",          country:"United States",  flag:"🇺🇸", qs:39},
+  {id:41,  name:"Carnegie Mellon University",                   short:"CMU",          country:"United States",  flag:"🇺🇸", qs:52},
+  {id:42,  name:"Ludwig Maximilian University Munich",          short:"LMU Munich",   country:"Germany",        flag:"🇩🇪", qs:54},
+  {id:43,  name:"Korea Advanced Institute of Science & Technology", short:"KAIST",   country:"South Korea",    flag:"🇰🇷", qs:47},
+  {id:44,  name:"Seoul National University",                    short:"SNU",          country:"South Korea",    flag:"🇰🇷", qs:41},
+  {id:45,  name:"University of Texas at Austin",                short:"UT Austin",    country:"United States",  flag:"🇺🇸", qs:67},
+  {id:46,  name:"Monash University",                            short:"Monash",       country:"Australia",      flag:"🇦🇺", qs:42},
+  {id:47,  name:"University of Manchester",                     short:"Manchester",   country:"United Kingdom", flag:"🇬🇧", qs:34},
+  {id:48,  name:"Hong Kong University of Science & Technology", short:"HKUST",        country:"Hong Kong",      flag:"🇭🇰", qs:40},
+  {id:49,  name:"Delft University of Technology",               short:"TU Delft",     country:"Netherlands",    flag:"🇳🇱", qs:57},
+  {id:50,  name:"University of Washington",                     short:"UW",           country:"United States",  flag:"🇺🇸", qs:64},
+  {id:51,  name:"University of Bristol",                        short:"Bristol",      country:"United Kingdom", flag:"🇬🇧", qs:55},
+  {id:52,  name:"KU Leuven",                                    short:"KU Leuven",    country:"Belgium",        flag:"🇧🇪", qs:74},
+  {id:53,  name:"Paris Sciences et Lettres",                    short:"PSL",          country:"France",         flag:"🇫🇷", qs:24},
+  {id:54,  name:"Sorbonne University",                          short:"Sorbonne",     country:"France",         flag:"🇫🇷", qs:59},
+  {id:55,  name:"University of Warwick",                        short:"Warwick",      country:"United Kingdom", flag:"🇬🇧", qs:67},
+  {id:56,  name:"Osaka University",                             short:"Osaka",        country:"Japan",          flag:"🇯🇵", qs:80},
+  {id:57,  name:"University of Auckland",                       short:"Auckland",     country:"New Zealand",    flag:"🇳🇿", qs:68},
+  {id:58,  name:"Yonsei University",                            short:"Yonsei",       country:"South Korea",    flag:"🇰🇷", qs:79},
+  {id:59,  name:"Korea University",                             short:"Korea Univ",   country:"South Korea",    flag:"🇰🇷", qs:79},
+  {id:60,  name:"Universidad de Buenos Aires",                  short:"UBA",          country:"Argentina",      flag:"🇦🇷", qs:64},
+  {id:61,  name:"University of Cape Town",                      short:"UCT",          country:"South Africa",   flag:"🇿🇦", qs:226},
+  {id:62,  name:"University of Glasgow",                        short:"Glasgow",      country:"United Kingdom", flag:"🇬🇧", qs:81},
+  {id:63,  name:"University of Birmingham",                     short:"Birmingham",   country:"United Kingdom", flag:"🇬🇧", qs:101},
+  {id:64,  name:"Tohoku University",                            short:"Tohoku",       country:"Japan",          flag:"🇯🇵", qs:91},
+  {id:65,  name:"University of Leeds",                          short:"Leeds",        country:"United Kingdom", flag:"🇬🇧", qs:101},
+  {id:66,  name:"University of Southampton",                    short:"Southampton",  country:"United Kingdom", flag:"🇬🇧", qs:101},
+  {id:67,  name:"Hebrew University of Jerusalem",               short:"Hebrew Univ",  country:"Israel",         flag:"🇮🇱", qs:149},
+  {id:68,  name:"Technion – Israel Institute of Technology",    short:"Technion",     country:"Israel",         flag:"🇮🇱", qs:189},
+  {id:69,  name:"University of São Paulo",                      short:"USP",          country:"Brazil",         flag:"🇧🇷", qs:115},
+  {id:70,  name:"Pontifical Catholic University of Chile",      short:"PUC Chile",    country:"Chile",          flag:"🇨🇱", qs:171},
+  {id:71,  name:"IIT Bombay",                                   short:"IIT Bombay",   country:"India",          flag:"🇮🇳", qs:118},
+  {id:72,  name:"IIT Delhi",                                    short:"IIT Delhi",    country:"India",          flag:"🇮🇳", qs:197},
+  {id:73,  name:"University of Oslo",                           short:"Oslo",         country:"Norway",         flag:"🇳🇴", qs:191},
+  {id:74,  name:"Uppsala University",                           short:"Uppsala",      country:"Sweden",         flag:"🇸🇪", qs:163},
+  {id:75,  name:"Lund University",                              short:"Lund",         country:"Sweden",         flag:"🇸🇪", qs:97},
+  {id:76,  name:"University of Copenhagen",                     short:"Copenhagen",   country:"Denmark",        flag:"🇩🇰", qs:121},
+  {id:77,  name:"University of Helsinki",                       short:"Helsinki",     country:"Finland",        flag:"🇫🇮", qs:115},
+  {id:78,  name:"Leiden University",                            short:"Leiden",       country:"Netherlands",    flag:"🇳🇱", qs:129},
+  {id:79,  name:"Utrecht University",                           short:"Utrecht",      country:"Netherlands",    flag:"🇳🇱", qs:105},
+  {id:80,  name:"University of Vienna",                         short:"Vienna",       country:"Austria",        flag:"🇦🇹", qs:197},
+  {id:81,  name:"University of Zurich",                         short:"UZH",          country:"Switzerland",    flag:"🇨🇭", qs:109},
+  {id:82,  name:"Humboldt University of Berlin",                short:"HU Berlin",    country:"Germany",        flag:"🇩🇪", qs:128},
+  {id:83,  name:"Freie Universität Berlin",                     short:"FU Berlin",    country:"Germany",        flag:"🇩🇪", qs:136},
+  {id:84,  name:"University of Heidelberg",                     short:"Heidelberg",   country:"Germany",        flag:"🇩🇪", qs:87},
+  {id:85,  name:"RWTH Aachen University",                       short:"RWTH Aachen",  country:"Germany",        flag:"🇩🇪", qs:106},
+  {id:86,  name:"Karlsruhe Institute of Technology",            short:"KIT",          country:"Germany",        flag:"🇩🇪", qs:119},
+  {id:87,  name:"University of Bonn",                           short:"Bonn",         country:"Germany",        flag:"🇩🇪", qs:201},
+  {id:88,  name:"University of Freiburg",                       short:"Freiburg",     country:"Germany",        flag:"🇩🇪", qs:201},
+  {id:89,  name:"Ghent University",                             short:"Ghent",        country:"Belgium",        flag:"🇧🇪", qs:114},
+  {id:90,  name:"University of Liège",                          short:"Liège",        country:"Belgium",        flag:"🇧🇪", qs:301},
+  {id:91,  name:"Moscow State University",                      short:"MSU",          country:"Russia",         flag:"🇷🇺", qs:95},
+  {id:92,  name:"Saint Petersburg State University",            short:"SPBU",         country:"Russia",         flag:"🇷🇺", qs:242},
+  {id:93,  name:"University of Warsaw",                         short:"Warsaw",       country:"Poland",         flag:"🇵🇱", qs:284},
+  {id:94,  name:"Charles University Prague",                    short:"Charles Univ", country:"Czech Republic", flag:"🇨🇿", qs:295},
+  {id:95,  name:"University of Tartu",                          short:"Tartu",        country:"Estonia",        flag:"🇪🇪", qs:321},
+  {id:96,  name:"University of Lisbon",                         short:"ULisboa",      country:"Portugal",       flag:"🇵🇹", qs:235},
+  {id:97,  name:"University of Porto",                          short:"U.Porto",      country:"Portugal",       flag:"🇵🇹", qs:271},
+  {id:98,  name:"University of Barcelona",                      short:"UB",           country:"Spain",          flag:"🇪🇸", qs:148},
+  {id:99,  name:"Autonomous University of Barcelona",           short:"UAB",          country:"Spain",          flag:"🇪🇸", qs:201},
+  {id:100, name:"Complutense University of Madrid",             short:"UCM",          country:"Spain",          flag:"🇪🇸", qs:171},
+  {id:101, name:"University of Bologna",                        short:"UniBO",        country:"Italy",          flag:"🇮🇹", qs:154},
+  {id:102, name:"Sapienza University of Rome",                  short:"Sapienza",     country:"Italy",          flag:"🇮🇹", qs:171},
+  {id:103, name:"Polytechnic University of Milan",              short:"Polimi",       country:"Italy",          flag:"🇮🇹", qs:123},
+  {id:104, name:"University of Milan",                          short:"UniMI",        country:"Italy",          flag:"🇮🇹", qs:301},
+  {id:105, name:"Scuola Normale Superiore di Pisa",             short:"SNS Pisa",     country:"Italy",          flag:"🇮🇹", qs:284},
+  {id:106, name:"École Polytechnique",                          short:"X",            country:"France",         flag:"🇫🇷", qs:42},
+  {id:107, name:"CentraleSupélec",                              short:"CentraleSupélec", country:"France",      flag:"🇫🇷", qs:201},
+  {id:108, name:"Sciences Po Paris",                            short:"Sciences Po",  country:"France",         flag:"🇫🇷", qs:244},
+  {id:109, name:"University of Paris-Saclay",                   short:"Paris-Saclay", country:"France",         flag:"🇫🇷", qs:76},
+  {id:110, name:"Aix-Marseille University",                     short:"AMU",          country:"France",         flag:"🇫🇷", qs:264},
+  {id:111, name:"University of Groningen",                      short:"Groningen",    country:"Netherlands",    flag:"🇳🇱", qs:128},
+  {id:112, name:"Erasmus University Rotterdam",                 short:"EUR",          country:"Netherlands",    flag:"🇳🇱", qs:171},
+  {id:113, name:"Eindhoven University of Technology",           short:"TU/e",         country:"Netherlands",    flag:"🇳🇱", qs:124},
+  {id:114, name:"Wageningen University",                        short:"WUR",          country:"Netherlands",    flag:"🇳🇱", qs:109},
+  {id:115, name:"Radboud University",                           short:"Radboud",      country:"Netherlands",    flag:"🇳🇱", qs:192},
+  {id:116, name:"University of Exeter",                         short:"Exeter",       country:"United Kingdom", flag:"🇬🇧", qs:155},
+  {id:117, name:"University of Sheffield",                      short:"Sheffield",    country:"United Kingdom", flag:"🇬🇧", qs:113},
+  {id:118, name:"University of Nottingham",                     short:"Nottingham",   country:"United Kingdom", flag:"🇬🇧", qs:113},
+  {id:119, name:"Durham University",                            short:"Durham",       country:"United Kingdom", flag:"🇬🇧", qs:92},
+  {id:120, name:"University of St Andrews",                     short:"St Andrews",   country:"United Kingdom", flag:"🇬🇧", qs:100},
+  {id:121, name:"Queen Mary University of London",              short:"QMUL",         country:"United Kingdom", flag:"🇬🇧", qs:147},
+  {id:122, name:"Lancaster University",                         short:"Lancaster",    country:"United Kingdom", flag:"🇬🇧", qs:140},
+  {id:123, name:"Cardiff University",                           short:"Cardiff",      country:"United Kingdom", flag:"🇬🇧", qs:154},
+  {id:124, name:"University of Aberdeen",                       short:"Aberdeen",     country:"United Kingdom", flag:"🇬🇧", qs:296},
+  {id:125, name:"University of Reading",                        short:"Reading",      country:"United Kingdom", flag:"🇬🇧", qs:271},
+  {id:126, name:"University of California, Berkeley",           short:"UC Berkeley",  country:"United States",  flag:"🇺🇸", qs:12},
+  {id:127, name:"UCLA",                                         short:"UCLA",         country:"United States",  flag:"🇺🇸", qs:44},
+  {id:128, name:"University of California, San Diego",          short:"UCSD",         country:"United States",  flag:"🇺🇸", qs:62},
+  {id:129, name:"University of Illinois Urbana-Champaign",      short:"UIUC",         country:"United States",  flag:"🇺🇸", qs:65},
+  {id:130, name:"Georgia Institute of Technology",              short:"Georgia Tech",  country:"United States",  flag:"🇺🇸", qs:83},
+  {id:131, name:"University of Wisconsin–Madison",              short:"UW-Madison",   country:"United States",  flag:"🇺🇸", qs:84},
+  {id:132, name:"Northwestern University",                      short:"Northwestern", country:"United States",  flag:"🇺🇸", qs:32},
+  {id:133, name:"University of Minnesota",                      short:"UMinn",        country:"United States",  flag:"🇺🇸", qs:171},
+  {id:134, name:"Purdue University",                            short:"Purdue",        country:"United States",  flag:"🇺🇸", qs:109},
+  {id:135, name:"Ohio State University",                        short:"OSU",          country:"United States",  flag:"🇺🇸", qs:171},
+  {id:136, name:"Pennsylvania State University",                short:"Penn State",   country:"United States",  flag:"🇺🇸", qs:149},
+  {id:137, name:"Brown University",                             short:"Brown",        country:"United States",  flag:"🇺🇸", qs:149},
+  {id:138, name:"Dartmouth College",                            short:"Dartmouth",    country:"United States",  flag:"🇺🇸", qs:201},
+  {id:139, name:"Rice University",                              short:"Rice",         country:"United States",  flag:"🇺🇸", qs:163},
+  {id:140, name:"Vanderbilt University",                        short:"Vanderbilt",   country:"United States",  flag:"🇺🇸", qs:201},
+  {id:141, name:"University of Notre Dame",                     short:"Notre Dame",   country:"United States",  flag:"🇺🇸", qs:226},
+  {id:142, name:"Emory University",                             short:"Emory",        country:"United States",  flag:"🇺🇸", qs:264},
+  {id:143, name:"Georgetown University",                        short:"Georgetown",   country:"United States",  flag:"🇺🇸", qs:284},
+  {id:144, name:"University of California, Davis",              short:"UC Davis",     country:"United States",  flag:"🇺🇸", qs:149},
+  {id:145, name:"University of California, Santa Barbara",      short:"UCSB",         country:"United States",  flag:"🇺🇸", qs:154},
+  {id:146, name:"Arizona State University",                     short:"ASU",          country:"United States",  flag:"🇺🇸", qs:201},
+  {id:147, name:"Boston University",                            short:"BU",           country:"United States",  flag:"🇺🇸", qs:112},
+  {id:148, name:"Tufts University",                             short:"Tufts",        country:"United States",  flag:"🇺🇸", qs:264},
+  {id:149, name:"University of Rochester",                      short:"UR",           country:"United States",  flag:"🇺🇸", qs:226},
+  {id:150, name:"Case Western Reserve University",              short:"CWRU",         country:"United States",  flag:"🇺🇸", qs:264},
+  {id:151, name:"Osaka University",                             short:"Osaka",        country:"Japan",          flag:"🇯🇵", qs:80},
+  {id:152, name:"Nagoya University",                            short:"Nagoya",       country:"Japan",          flag:"🇯🇵", qs:137},
+  {id:153, name:"Tokyo Institute of Technology",                short:"Tokyo Tech",   country:"Japan",          flag:"🇯🇵", qs:55},
+  {id:154, name:"Hokkaido University",                          short:"Hokkaido",     country:"Japan",          flag:"🇯🇵", qs:137},
+  {id:155, name:"Keio University",                              short:"Keio",         country:"Japan",          flag:"🇯🇵", qs:189},
+  {id:156, name:"Waseda University",                            short:"Waseda",       country:"Japan",          flag:"🇯🇵", qs:201},
+  {id:157, name:"Kyushu University",                            short:"Kyushu",       country:"Japan",          flag:"🇯🇵", qs:201},
+  {id:158, name:"Shanghai Jiao Tong University",                short:"SJTU",         country:"China",          flag:"🇨🇳", qs:51},
+  {id:159, name:"Zhejiang University",                          short:"ZJU",          country:"China",          flag:"🇨🇳", qs:44},
+  {id:160, name:"University of Science and Technology of China", short:"USTC",        country:"China",          flag:"🇨🇳", qs:93},
+  {id:161, name:"Nanjing University",                           short:"NJU",          country:"China",          flag:"🇨🇳", qs:133},
+  {id:162, name:"Wuhan University",                             short:"WHU",          country:"China",          flag:"🇨🇳", qs:226},
+  {id:163, name:"Sun Yat-sen University",                       short:"SYSU",         country:"China",          flag:"🇨🇳", qs:284},
+  {id:164, name:"Harbin Institute of Technology",               short:"HIT",          country:"China",          flag:"🇨🇳", qs:236},
+  {id:165, name:"Tongji University",                            short:"Tongji",       country:"China",          flag:"🇨🇳", qs:244},
+  {id:166, name:"Renmin University of China",                   short:"RUC",          country:"China",          flag:"🇨🇳", qs:201},
+  {id:167, name:"Beijing Institute of Technology",              short:"BIT",          country:"China",          flag:"🇨🇳", qs:284},
+  {id:168, name:"Xi'an Jiaotong University",                    short:"XJTU",         country:"China",          flag:"🇨🇳", qs:284},
+  {id:169, name:"Shandong University",                          short:"SDU",          country:"China",          flag:"🇨🇳", qs:451},
+  {id:170, name:"University of Auckland",                       short:"Auckland",     country:"New Zealand",    flag:"🇳🇿", qs:68},
+  {id:171, name:"Victoria University of Wellington",            short:"VUW",          country:"New Zealand",    flag:"🇳🇿", qs:236},
+  {id:172, name:"University of Otago",                          short:"Otago",        country:"New Zealand",    flag:"🇳🇿", qs:206},
+  {id:173, name:"University of Adelaide",                       short:"Adelaide",     country:"Australia",      flag:"🇦🇺", qs:109},
+  {id:174, name:"University of Western Australia",              short:"UWA",          country:"Australia",      flag:"🇦🇺", qs:92},
+  {id:175, name:"Australian National University",               short:"ANU",          country:"Australia",      flag:"🇦🇺", qs:30},
+  {id:176, name:"RMIT University",                              short:"RMIT",         country:"Australia",      flag:"🇦🇺", qs:124},
+  {id:177, name:"Macquarie University",                         short:"Macquarie",    country:"Australia",      flag:"🇦🇺", qs:201},
+  {id:178, name:"University of Technology Sydney",              short:"UTS",          country:"Australia",      flag:"🇦🇺", qs:133},
+  {id:179, name:"University of Alberta",                        short:"UAlberta",     country:"Canada",         flag:"🇨🇦", qs:111},
+  {id:180, name:"McMaster University",                          short:"McMaster",     country:"Canada",         flag:"🇨🇦", qs:171},
+  {id:181, name:"University of Waterloo",                       short:"Waterloo",     country:"Canada",         flag:"🇨🇦", qs:112},
+  {id:182, name:"University of Ottawa",                         short:"UOttawa",      country:"Canada",         flag:"🇨🇦", qs:226},
+  {id:183, name:"Western University",                           short:"Western",      country:"Canada",         flag:"🇨🇦", qs:201},
+  {id:184, name:"Queen's University",                           short:"Queen's",      country:"Canada",         flag:"🇨🇦", qs:246},
+  {id:185, name:"Dalhousie University",                         short:"Dal",          country:"Canada",         flag:"🇨🇦", qs:301},
+  {id:186, name:"University of São Paulo",                      short:"USP",          country:"Brazil",         flag:"🇧🇷", qs:115},
+  {id:187, name:"Universidade Estadual de Campinas",            short:"Unicamp",      country:"Brazil",         flag:"🇧🇷", qs:201},
+  {id:188, name:"University of Chile",                          short:"U de Chile",   country:"Chile",          flag:"🇨🇱", qs:226},
+  {id:189, name:"Universidad Nacional Autónoma de México",      short:"UNAM",         country:"Mexico",         flag:"🇲🇽", qs:105},
+  {id:190, name:"Universidad de los Andes Colombia",            short:"Uniandes",     country:"Colombia",       flag:"🇨🇴", qs:264},
+  {id:191, name:"Tel Aviv University",                          short:"TAU",          country:"Israel",         flag:"🇮🇱", qs:197},
+  {id:192, name:"Weizmann Institute of Science",                short:"Weizmann",     country:"Israel",         flag:"🇮🇱", qs:284},
+  {id:193, name:"University of Cape Town",                      short:"UCT",          country:"South Africa",   flag:"🇿🇦", qs:226},
+  {id:194, name:"University of Pretoria",                       short:"UP",           country:"South Africa",   flag:"🇿🇦", qs:551},
+  {id:195, name:"Stellenbosch University",                      short:"Stellenbosch", country:"South Africa",   flag:"🇿🇦", qs:401},
+  {id:196, name:"Cairo University",                             short:"Cairo",        country:"Egypt",          flag:"🇪🇬", qs:551},
+  {id:197, name:"University of Tehran",                         short:"UT",           country:"Iran",           flag:"🇮🇷", qs:601},
+  {id:198, name:"King Abdulaziz University",                    short:"KAU",          country:"Saudi Arabia",   flag:"🇸🇦", qs:171},
+  {id:199, name:"King Fahd University",                         short:"KFUPM",        country:"Saudi Arabia",   flag:"🇸🇦", qs:271},
+  {id:200, name:"Qatar University",                             short:"QU",           country:"Qatar",          flag:"🇶🇦", qs:441},
+  {id:201, name:"American University of Beirut",                short:"AUB",          country:"Lebanon",        flag:"🇱🇧", qs:401},
+  {id:202, name:"University of Jordan",                         short:"UJ",           country:"Jordan",         flag:"🇯🇴", qs:551},
+  {id:203, name:"Indian Institute of Science",                  short:"IISc",         country:"India",          flag:"🇮🇳", qs:225},
+  {id:204, name:"IIT Madras",                                   short:"IIT Madras",   country:"India",          flag:"🇮🇳", qs:227},
+  {id:205, name:"IIT Kharagpur",                                short:"IIT KGP",      country:"India",          flag:"🇮🇳", qs:271},
+  {id:206, name:"IIT Kanpur",                                   short:"IIT Kanpur",   country:"India",          flag:"🇮🇳", qs:278},
+  {id:207, name:"University of Delhi",                          short:"DU",           country:"India",          flag:"🇮🇳", qs:328},
+  {id:208, name:"University of Calcutta",                       short:"CU",           country:"India",          flag:"🇮🇳", qs:801},
+  {id:209, name:"University of Malaya",                         short:"UM",           country:"Malaysia",       flag:"🇲🇾", qs:65},
+  {id:210, name:"Universiti Putra Malaysia",                    short:"UPM",          country:"Malaysia",       flag:"🇲🇾", qs:130},
+  {id:211, name:"Universiti Teknologi Malaysia",                short:"UTM",          country:"Malaysia",       flag:"🇲🇾", qs:197},
+  {id:212, name:"Universiti Sains Malaysia",                    short:"USM",          country:"Malaysia",       flag:"🇲🇾", qs:144},
+  {id:213, name:"Chulalongkorn University",                     short:"CU",           country:"Thailand",       flag:"🇹🇭", qs:201},
+  {id:214, name:"Mahidol University",                           short:"Mahidol",      country:"Thailand",       flag:"🇹🇭", qs:271},
+  {id:215, name:"University of Indonesia",                      short:"UI",           country:"Indonesia",      flag:"🇮🇩", qs:201},
+  {id:216, name:"Bandung Institute of Technology",              short:"ITB",          country:"Indonesia",      flag:"🇮🇩", qs:284},
+  {id:217, name:"Universitas Gadjah Mada",                      short:"UGM",          country:"Indonesia",      flag:"🇮🇩", qs:284},
+  {id:218, name:"University of the Philippines",                short:"UP",           country:"Philippines",    flag:"🇵🇭", qs:396},
+  {id:219, name:"Ateneo de Manila University",                  short:"Ateneo",       country:"Philippines",    flag:"🇵🇭", qs:701},
+  {id:220, name:"Vietnam National University Hanoi",            short:"VNU Hanoi",    country:"Vietnam",        flag:"🇻🇳", qs:1201},
+  {id:221, name:"Pohang University of Science & Technology",    short:"POSTECH",      country:"South Korea",    flag:"🇰🇷", qs:79},
+  {id:222, name:"Sungkyunkwan University",                      short:"SKKU",         country:"South Korea",    flag:"🇰🇷", qs:101},
+  {id:223, name:"Hanyang University",                           short:"Hanyang",      country:"South Korea",    flag:"🇰🇷", qs:154},
+  {id:224, name:"University of Science and Technology Beijing", short:"USTB",         country:"China",          flag:"🇨🇳", qs:601},
+  {id:225, name:"Beijing Normal University",                    short:"BNU",          country:"China",          flag:"🇨🇳", qs:284},
+  {id:226, name:"East China Normal University",                 short:"ECNU",         country:"China",          flag:"🇨🇳", qs:301},
+  {id:227, name:"Lomonosov Moscow State University",            short:"MSU",          country:"Russia",         flag:"🇷🇺", qs:95},
+  {id:228, name:"Novosibirsk State University",                 short:"NSU",          country:"Russia",         flag:"🇷🇺", qs:226},
+  {id:229, name:"Universidad Autónoma de Madrid",               short:"UAM",          country:"Spain",          flag:"🇪🇸", qs:197},
+  {id:230, name:"Pompeu Fabra University",                      short:"UPF",          country:"Spain",          flag:"🇪🇸", qs:201},
+  {id:231, name:"University of Valencia",                       short:"UV",           country:"Spain",          flag:"🇪🇸", qs:551},
+  {id:232, name:"University of Granada",                        short:"UGR",          country:"Spain",          flag:"🇪🇸", qs:351},
+  {id:233, name:"KTH Royal Institute of Technology",            short:"KTH",          country:"Sweden",         flag:"🇸🇪", qs:98},
+  {id:234, name:"Chalmers University of Technology",            short:"Chalmers",     country:"Sweden",         flag:"🇸🇪", qs:171},
+  {id:235, name:"Stockholm University",                         short:"SU",           country:"Sweden",         flag:"🇸🇪", qs:196},
+  {id:236, name:"University of Oslo",                           short:"UiO",          country:"Norway",         flag:"🇳🇴", qs:191},
+  {id:237, name:"Norwegian University of Science and Technology", short:"NTNU",       country:"Norway",         flag:"🇳🇴", qs:392},
+  {id:238, name:"University of Copenhagen",                     short:"UCPH",         country:"Denmark",        flag:"🇩🇰", qs:121},
+  {id:239, name:"Aarhus University",                            short:"AU",           country:"Denmark",        flag:"🇩🇰", qs:148},
+  {id:240, name:"Technical University of Denmark",              short:"DTU",          country:"Denmark",        flag:"🇩🇰", qs:186},
+  {id:241, name:"Aalto University",                             short:"Aalto",        country:"Finland",        flag:"🇫🇮", qs:109},
+  {id:242, name:"University of Turku",                          short:"UTU",          country:"Finland",        flag:"🇫🇮", qs:371},
+  {id:243, name:"University College Dublin",                    short:"UCD",          country:"Ireland",        flag:"🇮🇪", qs:181},
+  {id:244, name:"Trinity College Dublin",                       short:"TCD",          country:"Ireland",        flag:"🇮🇪", qs:98},
+  {id:245, name:"University of Warsaw",                         short:"UW",           country:"Poland",         flag:"🇵🇱", qs:284},
+  {id:246, name:"Warsaw University of Technology",              short:"WUT",          country:"Poland",         flag:"🇵🇱", qs:411},
+  {id:247, name:"University of Athens",                         short:"NKUA",         country:"Greece",         flag:"🇬🇷", qs:591},
+  {id:248, name:"Aristotle University of Thessaloniki",         short:"AUTH",         country:"Greece",         flag:"🇬🇷", qs:471},
+  {id:249, name:"Boğaziçi University",                          short:"BOUN",         country:"Turkey",         flag:"🇹🇷", qs:451},
+  {id:250, name:"Middle East Technical University",             short:"METU",         country:"Turkey",         flag:"🇹🇷", qs:601},
+];
+
+// ============================================================
+// ELO ENGINE
+// ============================================================
+let eloData = {};
+let totalVotes = 0;
+
+function initElo() {
+  const saved = localStorage.getItem('uniwar_elo_v2');
+  const savedVotes = localStorage.getItem('uniwar_votes_v2');
+  if (saved) {
+    eloData = JSON.parse(saved);
+    totalVotes = parseInt(savedVotes || '0');
+    // Make sure any new universities added get initialized
+    universities.forEach(u => {
+      if (!eloData[u.id]) {
+        eloData[u.id] = { elo: 1500, wins: 0, losses: 0 };
+      }
+    });
+  } else {
+    universities.forEach(u => {
+      // Top QS schools start slightly higher to reflect prestige
+      const bonus = Math.max(0, Math.round((30 - Math.min(u.qs, 30)) * 1.5));
+      eloData[u.id] = { elo: 1500 + bonus, wins: 0, losses: 0 };
+    });
+  }
+  document.getElementById('totalVotes').textContent = totalVotes.toLocaleString();
+}
+
+function saveElo() {
+  localStorage.setItem('uniwar_elo_v2', JSON.stringify(eloData));
+  localStorage.setItem('uniwar_votes_v2', totalVotes.toString());
+}
+
+function calcEloChange(winnerElo, loserElo) {
+  const K = 32;
+  const expected = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400));
+  return Math.round(K * (1 - expected));
+}
+
+// ============================================================
+// BATTLE
+// ============================================================
+let currentA = null, currentB = null;
+let isAnimating = false;
+
+function getRandomPair() {
+  let a, b;
+  do {
+    a = universities[Math.floor(Math.random() * universities.length)];
+    b = universities[Math.floor(Math.random() * universities.length)];
+  } while (a.id === b.id);
+  return [a, b];
+}
+
+function renderBattle(uniA, uniB) {
+  currentA = uniA;
+  currentB = uniB;
+
+  ['A','B'].forEach(side => {
+    const u = side === 'A' ? uniA : uniB;
+    document.getElementById(`name${side}`).textContent = u.name;
+    document.getElementById(`flag${side}`).textContent = u.flag;
+    document.getElementById(`country${side}`).textContent = u.country;
+    document.getElementById(`rank${side}`).textContent = `QS RANK #${u.qs}`;
+    document.getElementById(`elo${side}`).textContent = Math.round(eloData[u.id].elo);
+  });
+}
+
+function vote(winner) {
+  if (isAnimating) return;
+  isAnimating = true;
+
+  const winUni = winner === 'A' ? currentA : currentB;
+  const loseUni = winner === 'A' ? currentB : currentA;
+
+  const change = calcEloChange(eloData[winUni.id].elo, eloData[loseUni.id].elo);
+  eloData[winUni.id].elo += change;
+  eloData[winUni.id].wins++;
+  eloData[loseUni.id].elo -= change;
+  eloData[loseUni.id].losses++;
+  totalVotes++;
+
+  document.getElementById('totalVotes').textContent = totalVotes.toLocaleString();
+  saveElo();
+
+  // Flash result
+  document.getElementById('resultName').textContent = winUni.name;
+  document.getElementById('resultElo').innerHTML =
+    `${winUni.flag} <span class="up">+${change} ELO</span> &nbsp;·&nbsp; ${loseUni.flag} <span class="down">-${change} ELO</span>`;
+
+  const flash = document.getElementById('resultFlash');
+  flash.classList.add('show');
+
+  setTimeout(() => {
+    flash.classList.remove('show');
+    const [a, b] = getRandomPair();
+    renderBattle(a, b);
+    isAnimating = false;
+  }, 800);
+}
+
+function nextBattle() {
+  const [a, b] = getRandomPair();
+  renderBattle(a, b);
+}
+
+// ============================================================
+// RANKINGS
+// ============================================================
+let currentFilter = '';
+
+function filterRankings(val) {
+  currentFilter = val.toLowerCase();
+  renderRankings();
+}
+
+function renderRankings() {
+  const sorted = [...universities].sort((a, b) => eloData[b.id].elo - eloData[a.id].elo);
+  const filtered = currentFilter
+    ? sorted.filter(u => u.name.toLowerCase().includes(currentFilter) || u.country.toLowerCase().includes(currentFilter) || u.short.toLowerCase().includes(currentFilter))
+    : sorted;
+
+  const tbody = document.getElementById('rankingsBody');
+  tbody.innerHTML = '';
+
+  filtered.forEach((u, i) => {
+    const d = eloData[u.id];
+    const globalRank = sorted.indexOf(u) + 1;
+    const total = d.wins + d.losses;
+    const winrate = total > 0 ? Math.round((d.wins / total) * 100) : 50;
+
+    tbody.innerHTML += `
+      <tr>
+        <td class="rank-num ${globalRank <= 3 ? 'top3' : ''}">${globalRank}</td>
+        <td>
+          <div class="uni-info">
+            <span class="uni-flag-small">${u.flag}</span>
+            <div>
+              <div class="uni-name-cell">${u.name}</div>
+              <div class="uni-country-cell">${u.country}</div>
+            </div>
+          </div>
+        </td>
+        <td style="text-align:right;font-size:12px;color:var(--muted)">${u.qs}</td>
+        <td class="elo-cell">${Math.round(d.elo)}</td>
+        <td class="wins-cell">${d.wins}W/${d.losses}L</td>
+        <td>
+          <div class="winrate-bar">
+            <span style="font-size:11px;color:var(--muted)">${winrate}%</span>
+            <div class="bar-bg"><div class="bar-fill" style="width:${winrate}%"></div></div>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(tab) {
+  document.querySelectorAll('nav button').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && tab === 'battle') || (i === 1 && tab === 'rankings'));
+  });
+  document.getElementById('tab-battle').classList.toggle('active', tab === 'battle');
+  document.getElementById('tab-rankings').classList.toggle('active', tab === 'rankings');
+  if (tab === 'rankings') renderRankings();
+}
+
+// ============================================================
+// BOOT
+// ============================================================
+initElo();
+const [a, b] = getRandomPair();
+renderBattle(a, b);
+</script>
+
+</body>
+</html>
