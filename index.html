@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -20,267 +19,266 @@
     --lose: #ff3c00;
   }
 
-- { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-background: var(–bg);
-color: var(–text);
-font-family: ‘Space Mono’, monospace;
-min-height: 100vh;
-overflow-x: hidden;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 0;
-}
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
 
-header {
-border-bottom: 1px solid var(–border);
-padding: 16px 40px;
-display: flex;
-justify-content: space-between;
-align-items: center;
-position: relative;
-z-index: 10;
-}
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+  }
 
-.logo { font-family: ‘Bebas Neue’, sans-serif; font-size: 28px; letter-spacing: 3px; }
-.logo span { color: var(–accent); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; }
+  .logo span { color: var(--accent); }
 
-.vote-counter { font-size: 11px; color: var(–muted); text-align: right; line-height: 1.6; }
-.vote-counter strong { color: var(–accent2); font-size: 18px; display: block; }
+  .vote-counter { font-size: 11px; color: var(--muted); text-align: right; line-height: 1.6; }
+  .vote-counter strong { color: var(--accent2); font-size: 18px; display: block; }
 
-.db-status {
-font-size: 10px;
-letter-spacing: 1px;
-padding: 4px 10px;
-border-radius: 2px;
-}
-.db-status.live { color: var(–win); border: 1px solid var(–win); }
-.db-status.offline { color: var(–muted); border: 1px solid var(–muted); }
+  .db-status {
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+  .db-status.live { color: var(--win); border: 1px solid var(--win); }
+  .db-status.offline { color: var(--muted); border: 1px solid var(--muted); }
 
-nav {
-display: flex;
-border-bottom: 1px solid var(–border);
-position: relative;
-z-index: 10;
-}
+  nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+  }
 
-nav button {
-background: none;
-border: none;
-padding: 14px 28px;
-color: var(–muted);
-font-family: ‘Space Mono’, monospace;
-font-size: 11px;
-letter-spacing: 2px;
-text-transform: uppercase;
-cursor: pointer;
-border-bottom: 2px solid transparent;
-transition: all 0.2s;
-}
+  nav button {
+    background: none;
+    border: none;
+    padding: 14px 28px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
 
-nav button.active { color: var(–text); border-bottom-color: var(–accent); }
-nav button:hover { color: var(–text); }
+  nav button.active { color: var(--text); border-bottom-color: var(--accent); }
+  nav button:hover { color: var(--text); }
 
-main {
-position: relative;
-z-index: 10;
-max-width: 1100px;
-margin: 0 auto;
-padding: 40px 20px;
-}
+  main {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
 
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 
-.battle-headline {
-font-family: ‘Bebas Neue’, sans-serif;
-font-size: clamp(32px, 5vw, 56px);
-letter-spacing: 4px;
-text-align: center;
-margin-bottom: 8px;
-line-height: 1;
-}
+  .battle-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 5vw, 56px);
+    letter-spacing: 4px;
+    text-align: center;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
 
-.battle-subline {
-text-align: center;
-font-size: 11px;
-color: var(–muted);
-letter-spacing: 2px;
-margin-bottom: 48px;
-}
+  .battle-subline {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 48px;
+  }
 
-.battle-arena {
-display: grid;
-grid-template-columns: 1fr auto 1fr;
-gap: 20px;
-align-items: center;
-margin-bottom: 32px;
-}
+  .battle-arena {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 32px;
+  }
 
-.university-card {
-background: var(–surface);
-border: 1px solid var(–border);
-padding: 32px 28px;
-cursor: pointer;
-transition: all 0.15s ease;
-position: relative;
-overflow: hidden;
-min-height: 200px;
-}
+  .university-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px 28px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+  }
 
-.university-card::before {
-content: ‘’;
-position: absolute;
-inset: 0;
-background: var(–accent);
-opacity: 0;
-transition: opacity 0.15s;
-}
+  .university-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
 
-.university-card:hover::before { opacity: 0.05; }
-.university-card:hover { border-color: var(–accent); transform: translateY(-2px); }
-.university-card:active { transform: scale(0.98); }
+  .university-card:hover::before { opacity: 0.05; }
+  .university-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .university-card:active { transform: scale(0.98); }
 
-.card-rank { font-size: 11px; color: var(–muted); letter-spacing: 2px; margin-bottom: 16px; }
-.card-flag { font-size: 36px; margin-bottom: 12px; display: block; }
-.card-name {
-font-family: ‘Bebas Neue’, sans-serif;
-font-size: clamp(18px, 2.5vw, 30px);
-letter-spacing: 2px;
-line-height: 1.1;
-margin-bottom: 8px;
-}
-.card-country { font-size: 11px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; }
-.card-elo { position: absolute; top: 16px; right: 16px; font-size: 11px; color: var(–accent2); letter-spacing: 1px; }
-.card-elo span { font-size: 18px; font-weight: 700; display: block; text-align: right; }
+  .card-rank { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 16px; }
+  .card-flag { font-size: 36px; margin-bottom: 12px; display: block; }
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(18px, 2.5vw, 30px);
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .card-country { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .card-elo { position: absolute; top: 16px; right: 16px; font-size: 11px; color: var(--accent2); letter-spacing: 1px; }
+  .card-elo span { font-size: 18px; font-weight: 700; display: block; text-align: right; }
 
-.vs-divider {
-font-family: ‘Bebas Neue’, sans-serif;
-font-size: 48px;
-color: var(–accent);
-text-align: center;
-line-height: 1;
-text-shadow: 0 0 30px rgba(255,60,0,0.5);
-}
+  .vs-divider {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--accent);
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(255,60,0,0.5);
+  }
 
-.battle-actions { text-align: center; margin-top: 16px; }
+  .battle-actions { text-align: center; margin-top: 16px; }
 
-.skip-btn {
-background: none;
-border: 1px solid var(–border);
-color: var(–muted);
-font-family: ‘Space Mono’, monospace;
-font-size: 11px;
-letter-spacing: 2px;
-padding: 10px 24px;
-cursor: pointer;
-text-transform: uppercase;
-transition: all 0.2s;
-}
-.skip-btn:hover { border-color: var(–muted); color: var(–text); }
+  .skip-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 10px 24px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .skip-btn:hover { border-color: var(--muted); color: var(--text); }
 
-.result-flash {
-position: fixed;
-inset: 0;
-display: flex;
-align-items: center;
-justify-content: center;
-background: rgba(0,0,0,0.85);
-z-index: 100;
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.15s;
-}
-.result-flash.show { opacity: 1; pointer-events: all; }
+  .result-flash {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  .result-flash.show { opacity: 1; pointer-events: all; }
 
-.result-content { text-align: center; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .result-content { text-align: center; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-@keyframes pop {
-from { transform: scale(0.7); opacity: 0; }
-to { transform: scale(1); opacity: 1; }
-}
+  @keyframes pop {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
 
-.result-winner { font-family: ‘Bebas Neue’, sans-serif; font-size: 72px; color: var(–win); letter-spacing: 4px; line-height: 1; }
-.result-name { font-size: 18px; color: var(–text); margin-top: 8px; letter-spacing: 2px; }
-.result-elo-change { margin-top: 16px; font-size: 13px; color: var(–muted); }
-.result-elo-change .up { color: var(–win); }
-.result-elo-change .down { color: var(–lose); }
+  .result-winner { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: var(--win); letter-spacing: 4px; line-height: 1; }
+  .result-name { font-size: 18px; color: var(--text); margin-top: 8px; letter-spacing: 2px; }
+  .result-elo-change { margin-top: 16px; font-size: 13px; color: var(--muted); }
+  .result-elo-change .up { color: var(--win); }
+  .result-elo-change .down { color: var(--lose); }
 
-.rankings-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-.rankings-title { font-family: ‘Bebas Neue’, sans-serif; font-size: 42px; letter-spacing: 3px; }
-.rankings-subtitle { font-size: 11px; color: var(–muted); letter-spacing: 1px; }
+  .rankings-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .rankings-title { font-family: 'Bebas Neue', sans-serif; font-size: 42px; letter-spacing: 3px; }
+  .rankings-subtitle { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
 
-.search-box {
-background: var(–surface);
-border: 1px solid var(–border);
-color: var(–text);
-font-family: ‘Space Mono’, monospace;
-font-size: 12px;
-padding: 10px 16px;
-width: 220px;
-outline: none;
-letter-spacing: 1px;
-}
-.search-box:focus { border-color: var(–accent); }
-.search-box::placeholder { color: var(–muted); }
+  .search-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 10px 16px;
+    width: 220px;
+    outline: none;
+    letter-spacing: 1px;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--muted); }
 
-.rankings-table { width: 100%; border-collapse: collapse; }
-.rankings-table thead tr { border-bottom: 1px solid var(–border); }
-.rankings-table th { font-size: 10px; color: var(–muted); letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; text-align: left; }
-.rankings-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
-.rankings-table tbody tr:hover { background: rgba(255,255,255,0.03); }
-.rankings-table td { padding: 14px 16px; font-size: 13px; }
+  .rankings-table { width: 100%; border-collapse: collapse; }
+  .rankings-table thead tr { border-bottom: 1px solid var(--border); }
+  .rankings-table th { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; padding: 12px 16px; text-align: left; }
+  .rankings-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.15s; }
+  .rankings-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+  .rankings-table td { padding: 14px 16px; font-size: 13px; }
 
-.rank-num { font-family: ‘Bebas Neue’, sans-serif; font-size: 20px; color: var(–muted); width: 50px; }
-.rank-num.top3 { color: var(–accent2); }
+  .rank-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--muted); width: 50px; }
+  .rank-num.top3 { color: var(--accent2); }
 
-.uni-info { display: flex; align-items: center; gap: 12px; }
-.uni-flag-small { font-size: 20px; }
-.uni-name-cell { font-weight: 700; letter-spacing: 0.5px; }
-.uni-country-cell { font-size: 11px; color: var(–muted); margin-top: 2px; }
+  .uni-info { display: flex; align-items: center; gap: 12px; }
+  .uni-flag-small { font-size: 20px; }
+  .uni-name-cell { font-weight: 700; letter-spacing: 0.5px; }
+  .uni-country-cell { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
-.elo-cell { text-align: right; font-family: ‘Bebas Neue’, sans-serif; font-size: 22px; color: var(–accent2); letter-spacing: 1px; }
-.wins-cell { text-align: right; font-size: 12px; color: var(–muted); }
+  .elo-cell { text-align: right; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--accent2); letter-spacing: 1px; }
+  .wins-cell { text-align: right; font-size: 12px; color: var(--muted); }
 
-.winrate-bar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
-.bar-bg { width: 60px; height: 4px; background: var(–border); border-radius: 2px; overflow: hidden; }
-.bar-fill { height: 100%; background: var(–accent); border-radius: 2px; }
+  .winrate-bar { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  .bar-bg { width: 60px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--accent); border-radius: 2px; }
 
-.loading {
-text-align: center;
-color: var(–muted);
-font-size: 12px;
-letter-spacing: 2px;
-padding: 60px 0;
-}
+  .loading {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 60px 0;
+  }
 
-footer {
-border-top: 1px solid var(–border);
-padding: 20px 40px;
-text-align: center;
-font-size: 10px;
-color: var(–muted);
-letter-spacing: 1px;
-position: relative;
-z-index: 10;
-margin-top: 60px;
-}
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    text-align: center;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 10;
+    margin-top: 60px;
+  }
 
-@media (max-width: 700px) {
-.battle-arena { grid-template-columns: 1fr; gap: 12px; }
-.vs-divider { font-size: 32px; }
-header { padding: 16px 20px; }
-nav button { padding: 12px 14px; font-size: 10px; }
-}
+  @media (max-width: 700px) {
+    .battle-arena { grid-template-columns: 1fr; gap: 12px; }
+    .vs-divider { font-size: 32px; }
+    header { padding: 16px 20px; }
+    nav button { padding: 12px 14px; font-size: 10px; }
+  }
 </style>
-
 </head>
 <body>
 
@@ -305,32 +303,29 @@ nav button { padding: 12px 14px; font-size: 10px; }
     <div class="battle-headline">WHICH UNIVERSITY WINS?</div>
     <div class="battle-subline">VOTE · RANK · REPEAT — REAL-TIME GLOBAL ELO RANKINGS</div>
 
-```
-<div class="battle-arena">
-  <div class="university-card" id="cardA" onclick="vote('A')">
-    <div class="card-elo">ELO <span id="eloA">—</span></div>
-    <div class="card-rank" id="rankA"></div>
-    <span class="card-flag" id="flagA">⏳</span>
-    <div class="card-name" id="nameA">Loading...</div>
-    <div class="card-country" id="countryA"></div>
-  </div>
+    <div class="battle-arena">
+      <div class="university-card" id="cardA" onclick="vote('A')">
+        <div class="card-elo">ELO <span id="eloA">—</span></div>
+        <div class="card-rank" id="rankA"></div>
+        <span class="card-flag" id="flagA">⏳</span>
+        <div class="card-name" id="nameA">Loading...</div>
+        <div class="card-country" id="countryA"></div>
+      </div>
 
-  <div class="vs-divider">VS</div>
+      <div class="vs-divider">VS</div>
 
-  <div class="university-card" id="cardB" onclick="vote('B')">
-    <div class="card-elo">ELO <span id="eloB">—</span></div>
-    <div class="card-rank" id="rankB"></div>
-    <span class="card-flag" id="flagB">⏳</span>
-    <div class="card-name" id="nameB">Loading...</div>
-    <div class="card-country" id="countryB"></div>
-  </div>
-</div>
+      <div class="university-card" id="cardB" onclick="vote('B')">
+        <div class="card-elo">ELO <span id="eloB">—</span></div>
+        <div class="card-rank" id="rankB"></div>
+        <span class="card-flag" id="flagB">⏳</span>
+        <div class="card-name" id="nameB">Loading...</div>
+        <div class="card-country" id="countryB"></div>
+      </div>
+    </div>
 
-<div class="battle-actions">
-  <button class="skip-btn" onclick="nextBattle()">SKIP THIS MATCHUP →</button>
-</div>
-```
-
+    <div class="battle-actions">
+      <button class="skip-btn" onclick="nextBattle()">SKIP THIS MATCHUP →</button>
+    </div>
   </div>
 
   <div class="tab-content" id="tab-rankings">
@@ -854,6 +849,5 @@ function showTab(tab) {
 // ============================================================
 initDb();
 </script>
-
 </body>
 </html>
