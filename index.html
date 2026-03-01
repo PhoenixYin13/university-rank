@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UniWar - The World's Universities, Ranked By You</title>
+<title>UniWar - Define Your Own University Elite</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
@@ -170,7 +170,8 @@
     line-height: 1;
     text-shadow: 0 0 30px rgba(255,60,0,0.3);
   }
-  .battle-subline { text-align: center; font-size: 10px; color: var(--muted); letter-spacing: 3px; margin-bottom: 24px; }
+  .battle-subline { text-align: center; font-size: 12px; color: var(--blue); letter-spacing: 4px; margin-bottom: 24px; text-transform: uppercase; font-weight: bold;}
+  .battle-subline span { color: var(--muted); font-size: 10px; font-weight: normal; display: block; margin-top: 8px;}
 
   /* BATTLE ARENA */
   .battle-arena {
@@ -337,7 +338,38 @@
 
   .loading { text-align: center; color: var(--muted); font-size: 11px; letter-spacing: 3px; padding: 60px 0; }
 
-  footer { border-top: 1px solid var(--border); padding: 20px 40px; text-align: center; font-size: 10px; color: var(--muted); letter-spacing: 2px; position: relative; z-index: 10; margin-top: 60px; }
+  /* ALGORITHM BOX & DEVELOPER SIGNATURE */
+  .algorithm-box {
+    max-width: 600px; margin: 60px auto 20px; padding: 24px;
+    border: 1px solid var(--border); background: rgba(13,17,23,0.5);
+    font-size: 11px; text-align: center; border-radius: 4px;
+    position: relative; z-index: 10;
+  }
+  .algo-title { color: var(--accent2); margin-bottom: 12px; letter-spacing: 2px; }
+  .algo-formula {
+    font-family: 'Space Mono', monospace; color: var(--text); font-size: 14px; 
+    margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .dev-signature {
+    text-align: center; margin-bottom: 40px; font-size: 10px; letter-spacing: 2px; color: var(--muted);
+    position: relative; z-index: 10;
+  }
+  .dev-name {
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    font-weight: bold;
+  }
+  .dev-name:hover { 
+    opacity: 1; 
+    text-shadow: 0 0 15px rgba(0,200,255,0.6); 
+  }
+
+  footer { border-top: 1px solid var(--border); padding: 20px 40px; text-align: center; font-size: 10px; color: var(--muted); letter-spacing: 2px; position: relative; z-index: 10; margin-top: 20px; }
 
   @media (max-width: 700px) {
     .battle-arena { grid-template-columns: 1fr; gap: 12px; }
@@ -346,6 +378,7 @@
     nav button { padding: 12px 16px; font-size: 10px; }
     .league-btn { font-size: 9px; padding: 6px 10px; }
     .bar-bg { width: 40px; }
+    .algorithm-box { margin: 40px 20px 20px; }
   }
 </style>
 
@@ -376,7 +409,7 @@
 <main>
   <div class="tab-content active" id="tab-battle">
     <div class="battle-headline">WHICH UNIVERSITY WINS?</div>
-    <div class="battle-subline">VOTE · RANK · REPEAT — INDEPENDENT ELO PER LEAGUE</div>
+    <div class="battle-subline">DEFINE YOUR OWN UNIVERSITY ELITE.<span>VOTE · RANK · REPEAT — INDEPENDENT ELO SYSTEM</span></div>
 
     <div class="league-bar">
       <button class="league-btn active" onclick="setBattleLeague('global',this)">GLOBAL</button>
@@ -430,6 +463,23 @@
     </div>
     <div id="rankingsContainer"><div class="loading">LOADING GLOBAL DATA...</div></div>
   </div>
+
+  <div class="algorithm-box">
+    <div class="algo-title">ALGORITHM: OPEN ELO SYSTEM</div>
+    <p style="color: var(--muted); line-height: 1.6;">
+      To ensure absolute neutrality, UniWar utilizes the official Elo rating system. 
+      The probability of University A winning is mathematically calculated as:
+    </p>
+    <div class="algo-formula">E_A = 1 / (1 + 10^((R_B - R_A) / 400))</div>
+    <p style="color: var(--muted); line-height: 1.6; margin-top: 8px;">
+      Zero middlemen. Zero bias. Built for transparency in the age of AI.
+    </p>
+  </div>
+  
+  <div class="dev-signature">
+    DEVELOPED WITH INTENT BY <span class="dev-name">PHOENIX YIN</span>
+  </div>
+
 </main>
 
 <div class="result-flash" id="resultFlash">
@@ -440,7 +490,7 @@
   </div>
 </div>
 
-<footer>ALL RANKINGS BASED ON PUBLIC VOTES &nbsp;·&nbsp; NOT AFFILIATED WITH ANY UNIVERSITY &nbsp;·&nbsp; FOR ENTERTAINMENT PURPOSES ONLY</footer>
+<footer>ALL RANKINGS BASED ON PUBLIC VOTES &nbsp;·&nbsp; NOT AFFILIATED WITH ANY UNIVERSITY OR QS/US NEWS &nbsp;·&nbsp; FOR ENTERTAINMENT PURPOSES ONLY</footer>
 
 <script>
 // ============================================================
@@ -474,7 +524,6 @@
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // connections
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
@@ -490,7 +539,6 @@
         }
       }
     }
-    // dots
     particles.forEach(p => {
       p.x += p.vx; p.y += p.vy;
       if (p.x < 0) p.x = W;
@@ -543,7 +591,7 @@ const LEAGUES = {
 };
 
 // ============================================================
-// DATA
+// DATA (FULL 250)
 // ============================================================
 const UNIVERSITIES = [
   {id:1,name:"Massachusetts Institute of Technology",short:"MIT",country:"United States",flag:"US",qs:1},
@@ -798,7 +846,6 @@ const UNIVERSITIES = [
   {id:250,name:"University of Science Technology Beijing",short:"USTB",country:"China",flag:"CN",qs:601}
 ];
 
-// UPDATED FLAG RENDERERS WITH ONERROR FALLBACK
 function getFlagEmoji(code) {
   if (!code || code.length !== 2) return "";
   const c = code.toLowerCase();
@@ -814,15 +861,11 @@ function getFlagLarge(code) {
 const UNI_MAP = {};
 UNIVERSITIES.forEach(u => { UNI_MAP[u.id] = u; });
 
-// Fuse search
 let fuse = null;
 function initFuse() {
   fuse = new Fuse(UNIVERSITIES, { keys: ['name','short','country'], threshold: 0.35 });
 }
 
-// ============================================================
-// STATE
-// ============================================================
 let globalElo = {}, leagueElo = {};
 let totalVotes = 0;
 let currentA = null, currentB = null;
@@ -830,9 +873,6 @@ let isAnimating = false, isDbLive = false;
 let currentBattleLeague = 'global', currentRankingsLeague = 'global';
 let currentFilter = '';
 
-// ============================================================
-// DB
-// ============================================================
 async function initDb() {
   try {
     const { data: gData, error } = await db.from('universities').select('*');
@@ -880,9 +920,6 @@ function calcEloChange(wElo, lElo) {
   return Math.round(32 * (1 - 1/(1 + Math.pow(10,(lElo-wElo)/400))));
 }
 
-// ============================================================
-// BATTLE
-// ============================================================
 function getLeaguePool(league) {
   const l = LEAGUES[league];
   if (!l.ids) return UNIVERSITIES;
@@ -917,7 +954,6 @@ function nextBattle() {
     document.getElementById('elo'+side).textContent = Math.round(d.elo);
   });
 
-  // Reset card states
   ['cardA','cardB'].forEach(id => {
     const c = document.getElementById(id);
     c.classList.remove('winner-anim','loser-anim','voting');
@@ -944,32 +980,26 @@ async function vote(winner) {
   totalVotes++;
   document.getElementById('totalVotes').textContent = totalVotes.toLocaleString();
 
-  // Animations
   const wCard = document.getElementById(winCard);
   const lCard = document.getElementById(loseCard);
   wCard.classList.add('voting','winner-anim');
   lCard.classList.add('loser-anim');
 
-  // Page flash
   const flashEl = document.getElementById(winner==='A' ? 'flashBlue' : 'flashPurple');
   flashEl.classList.remove('flash-anim');
   void flashEl.offsetWidth;
   flashEl.classList.add('flash-anim');
 
-  // Flash random particle
   window.flashParticle(winUni.id);
 
-  // Haptic
   if (navigator.vibrate) navigator.vibrate(30);
 
-  // Show result
   document.getElementById('resultName').textContent = winUni.name;
   document.getElementById('resultElo').innerHTML =
     getFlagEmoji(winUni.flag)+' <span class="up">+'+change+' ELO</span> &nbsp;·&nbsp; '+
     getFlagEmoji(loseUni.flag)+' <span class="down">-'+change+' ELO</span>';
   document.getElementById('resultFlash').classList.add('show');
 
-  // DB update
   if (isDbLive) {
     if (league === 'global') {
       Promise.all([
@@ -991,9 +1021,6 @@ async function vote(winner) {
   }, 900);
 }
 
-// ============================================================
-// RANKINGS
-// ============================================================
 function setRankingsLeague(league, btn) {
   currentRankingsLeague = league;
   document.querySelectorAll('.rankings-league-btn').forEach(b => b.classList.remove('active'));
@@ -1057,9 +1084,6 @@ function renderRankings() {
   document.getElementById('rankingsContainer').innerHTML = html;
 }
 
-// ============================================================
-// TABS
-// ============================================================
 function showTab(tab) {
   document.querySelectorAll('nav button').forEach((b,i) => {
     b.classList.toggle('active', (i===0&&tab==='battle')||(i===1&&tab==='rankings'));
@@ -1069,9 +1093,6 @@ function showTab(tab) {
   if (tab==='rankings') renderRankings();
 }
 
-// ============================================================
-// BOOT
-// ============================================================
 initFuse();
 initDb();
 </script>
